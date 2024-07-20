@@ -1,4 +1,4 @@
-import originalAxios from 'axios';
+import originalAxios, { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 
 const API_HOST = 'https://api.openweathermap.org';
@@ -15,7 +15,7 @@ axios.interceptors.response.use(
             data: response.data,
         } as any;
     },
-    (error) => {
+    (error: any) => {
         const { response } = error;
 
         if (response) {
@@ -38,16 +38,16 @@ export default function request({
     method = 'GET',
     url,
     ...options
-}) {
+}: { method?: string; url: string; data?: Record<string, any>; params?: Record<string, any>; }) {
     if (!url) {
         throw Error('No url provided');
     }
 
-    const newOptions = {
-        paramsSerializer: params => {
+    const newOptions: AxiosRequestConfig = {
+        paramsSerializer: (params: Record<string, any>) => {
             return qs.stringify(params, { arrayFormat: 'comma' });
         },
-        validateStatus: status => {
+        validateStatus: (status: number) => {
             return status >= 200 && status < 300;
         },
         method,
