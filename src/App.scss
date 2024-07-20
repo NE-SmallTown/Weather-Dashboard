@@ -1,0 +1,23 @@
+.app-page-root {
+
+    .search-section {
+
+        .search-input {
+            width: 200px;
+        }
+
+        .ant-menu {
+            border-right: none;
+        }
+
+        .ant-menu-item {
+            background-color: #f7f7f7;
+        }
+    }
+
+    .icon-is-fetching-weather {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+    }
+}
