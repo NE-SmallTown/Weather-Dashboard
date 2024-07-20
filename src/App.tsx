@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce';
 import dayjs from 'dayjs';
 import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import WeatherInfoPanel from './components/WeatherInfoPanel.tsx';
-import request from './utils/request';
+import { openWeatherMapApi } from './utils/request';
 import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts.ts';
 import { SearchCity, CityWeatherInfo } from './types';
 
@@ -23,7 +23,7 @@ function App() {
   const fetchSearchedCities = useCallback(debounce(async (city: string) => {
     setIsFetchingCities(true);
 
-    const res = await request({
+    const res = await openWeatherMapApi({
       url: '/data/2.5/find',
       data: {
         q: city,
@@ -60,7 +60,7 @@ function App() {
   const fetchCityWeatherInfo = useCallback(async (city: SearchCity) => {
     setIsFetchingWeatherInfo(true);
 
-    const res = await request({
+    const res = await openWeatherMapApi({
       url: '/data/2.5/weather',
       data: {
         lat: city.lat,
@@ -86,6 +86,7 @@ function App() {
 
     if (selectedCity) {
       setCurrentSearchCity('');
+      setSearchedCities([]);
       await fetchCityWeatherInfo(selectedCity);
     }
   }, [ searchedCities ]);
