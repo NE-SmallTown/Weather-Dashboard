@@ -18,7 +18,7 @@ function App() {
   const [ isFetchingCities, setIsFetchingCities ] = useState(false);
   const [ searchedCities, setSearchedCities ] = useState<SearchCity[]>([]);
   const [ isFetchingWeatherInfo, setIsFetchingWeatherInfo ] = useState(false);
-  const [ selectedCityWeatherInfo, setSelectedCityWeatherInfo ] = useState<CityWeatherInfo>(null);
+  const [ selectedCityWeatherInfo, setSelectedCityWeatherInfo ] = useState<CityWeatherInfo>(null!);
 
   const fetchSearchedCities = useCallback(debounce(async (city: string) => {
     setIsFetchingCities(true);
@@ -32,7 +32,7 @@ function App() {
     });
 
     if (res.status === 200) {
-      const cities = res.data.list.map(({ coord, id, name }) => ({
+      const cities = res.data.list.map(({ coord, id, name }: CityWeatherInfo) => ({
         id,
         name,
         lat: coord.lat,
@@ -45,7 +45,7 @@ function App() {
     }
 
     setIsFetchingCities(false);
-  }, 1000), []);
+  }, 1000) as Function, []);
 
   useEffect(() => {
     if (currentSearchCity) {
@@ -84,8 +84,10 @@ function App() {
     const selectedCityId = Number(clickedMenuItem.key);
     const selectedCity = searchedCities.find(({ id }) => id === selectedCityId);
 
-    setCurrentSearchCity('');
-    await fetchCityWeatherInfo(selectedCity);
+    if (selectedCity) {
+      setCurrentSearchCity('');
+      await fetchCityWeatherInfo(selectedCity);
+    }
   }, [ searchedCities ]);
 
   return (
