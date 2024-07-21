@@ -86,4 +86,4 @@ const createApi = (baseURL: string) => {
 
 export const openWeatherMapApi = createApi(API_HOST_OPEN_WEATHER_MAP);
 
-export const weatherApi = createApi(API_HOST_OPEN_WEATHER_MAP);
+export const weatherApi = createApi(API_HOST_WEATHER_API);

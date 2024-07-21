@@ -7,10 +7,10 @@ import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import WeatherInfoPanel from './components/WeatherInfoPanel.tsx';
 import { openWeatherMapApi } from './utils/request';
 import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts.ts';
-import { SearchCity, OpenWeatherMapWeatherInfo, UnifiedWeatherInfo } from './types';
+import { TAB_KEY_OPEN_WEATHER_MAP, useWeatherInfoTabItems } from './hooks/weatherInfo.tsx';
+import { SearchCity, OpenWeatherMapWeatherInfo } from './types';
 
 import './App.scss';
-import {useWeatherInfoTabItems} from './hooks/weatherInfo.tsx';
 
 dayjs.extend(dayjsUtcPlugin);
 
@@ -19,6 +19,7 @@ function App() {
   const [ isFetchingSearchedCities, setIsFetchingSearchedCities ] = useState(false);
   const [ searchedCities, setSearchedCities ] = useState<SearchCity[]>([]);
   const [ selectedCity, setSelectedCity ] = useState<SearchCity>(null!);
+  const [ currentActiveTabKey, setCurrentActiveTabKey ] = useState<string>(TAB_KEY_OPEN_WEATHER_MAP);
 
   const fetchSearchedCities = useCallback(debounce(async (city: string) => {
     setIsFetchingSearchedCities(true);
@@ -68,20 +69,20 @@ function App() {
     }
   }, [ searchedCities ]);
 
-  const weatherInfoTabItems = useWeatherInfoTabItems(selectedCity?.lat, selectedCity?.lon);
+  const weatherInfoTabItems = useWeatherInfoTabItems(currentActiveTabKey, selectedCity?.lat, selectedCity?.lon);
 
-  const weatherApiTabsItems: TabsProps['items'] = weatherInfoTabItems.map(({ id, label, isFetching, weatherInfo }) => ({
-    key: id,
-    label: label,
+  const weatherApiTabsItems: TabsProps['items'] = weatherInfoTabItems.map(({ tabKey, tabLabel, isFetching, weatherInfo }) => ({
+    key: tabKey,
+    label: tabLabel,
     children: (
       isFetching
         ? <Spin size='large' spinning={ true } className='icon-is-fetching-weather' />
-        : <WeatherInfoPanel weatherInfo={ weatherInfo } />
+        : (weatherInfo && <WeatherInfoPanel weatherInfo={ weatherInfo } />)
     ),
   }));
 
-  const handleWeatherApiTabsChange = useCallback(() => {
-    // todo
+  const handleWeatherApiTabsChange = useCallback((activeKey: string) => {
+    setCurrentActiveTabKey(activeKey);
   }, []);
 
   return (
@@ -111,7 +112,14 @@ function App() {
       </div>
 
       {
-        selectedCity && <Tabs items={ weatherApiTabsItems } onChange={ handleWeatherApiTabsChange } />
+        selectedCity && (
+          <Tabs
+            className='weather-tabs'
+            activeKey={ currentActiveTabKey }
+            items={ weatherApiTabsItems }
+            onChange={ handleWeatherApiTabsChange }
+          />
+        )
       }
     </div>
   )

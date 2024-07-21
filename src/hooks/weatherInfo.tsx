@@ -8,18 +8,22 @@ import { kelvin2centigrade } from '../utils';
 export type FetchWeatherInfoCallback = (lat: number, lon: number) => Promise<{ weatherInfo: UnifiedWeatherInfo, error: string }>;
 
 export interface WeatherInfoTabItem {
-  id: string;
-  label: string;
+  tabKey: string;
+  tabLabel: string;
   isFetching: boolean;
   weatherInfo: UnifiedWeatherInfo;
 }
 
-export const useTabItem = ({ id, label, lat, lon, fetchWeatherInfoCallback } : {
-  id: string;
-  label: string;
+export const TAB_KEY_OPEN_WEATHER_MAP = 'open-weather-map';
+export const TAB_KEY_WEATHER_API ='weather-api';
+
+export const useTabItem = ({ tabKey, tabLabel, lat, lon, fetchWeatherInfoCallback, currentActiveTabKey } : {
+  tabKey: string;
+  tabLabel: string;
   lat?: number;
   lon?: number;
   fetchWeatherInfoCallback: FetchWeatherInfoCallback;
+  currentActiveTabKey: string;
 }): WeatherInfoTabItem => {
   const [ isFetchingWeatherInfo, setIsFetchingWeatherInfo ] = useState(false);
   const [ weatherInfo, setWeatherInfo ] = useState<UnifiedWeatherInfo>(null!);
@@ -34,25 +38,25 @@ export const useTabItem = ({ id, label, lat, lon, fetchWeatherInfoCallback } : {
       setIsFetchingWeatherInfo(false);
     }
 
-    if (lat && lon) {
+    if (lat && lon && currentActiveTabKey === tabKey) {
       doFetch();
     }
-  }, [ fetchWeatherInfoCallback, lat, lon ]);
+  }, [ tabKey, lat, lon, fetchWeatherInfoCallback, currentActiveTabKey ]);
 
   return {
-    id,
-    label,
+    tabKey,
+    tabLabel,
     isFetching: isFetchingWeatherInfo,
     weatherInfo,
   };
 };
 
-export const useWeatherInfoTabItems = (lat?: number, lon?: number): WeatherInfoTabItem[] => [
-  useOpenWeatherMapApiTabItem(lat, lon),
-  useWeatherApiTabItem(lat, lon),
+export const useWeatherInfoTabItems = (currentActiveTabKey: string, lat?: number, lon?: number): WeatherInfoTabItem[] => [
+  useOpenWeatherMapApiTabItem(currentActiveTabKey, lat, lon),
+  useWeatherApiTabItem(currentActiveTabKey, lat, lon),
 ];
 
-export const useOpenWeatherMapApiTabItem = (lat?: number, lon?: number) => {
+export const useOpenWeatherMapApiTabItem = (currentActiveTabKey: string, lat?: number, lon?: number) => {
   const fetchCityWeatherInfo = useCallback(async (lat: number, lon: number) => {
     let weatherInfo: UnifiedWeatherInfo = null!;
     let error = null;
@@ -107,15 +111,16 @@ export const useOpenWeatherMapApiTabItem = (lat?: number, lon?: number) => {
   }, []);
 
   return useTabItem({
-    id: 'open-weather-map',
-    label: 'Open Weather Map Api',
+    tabKey: TAB_KEY_OPEN_WEATHER_MAP,
+    tabLabel: 'Open Weather Map Api',
     lat,
     lon,
     fetchWeatherInfoCallback: fetchCityWeatherInfo,
+    currentActiveTabKey,
   });
 };
 
-export const useWeatherApiTabItem = (lat?: number, lon?: number) => {
+export const useWeatherApiTabItem = (currentActiveTabKey: string, lat?: number, lon?: number) => {
   const fetchCityWeatherInfo = useCallback(async (lat: number, lon: number) => {
     let weatherInfo: UnifiedWeatherInfo = null!;
     let error = null;
@@ -138,7 +143,7 @@ export const useWeatherApiTabItem = (lat?: number, lon?: number) => {
         country: data.location.country,
         lon: data.location.lon,
         lat: data.location.lat,
-        localtime: data.location.localtime,
+        localtime: dayjs(data.location.localtime).format('DD/MM/YYYY HH:mm'),
         weatherIcon: data.current.condition.icon,
         temperature: data.current.temp_c,
         pressure: data.current.pressure_mb,
@@ -146,10 +151,10 @@ export const useWeatherApiTabItem = (lat?: number, lon?: number) => {
         description: data.current.condition.text,
         wind: {
           deg: data.current.wind_degree,
-          speed: (data.current.wind_kph) / 60 / 60 * 1000,
+          speed: Number(((data.current.wind_kph) / 60 / 60 * 1000).toFixed(1)),
         },
         humidity: data.current.humidity,
-        visibility: data.current.vis_km,
+        visibility: data.current.vis_km * 1000,
       };
     } else {
       // TODO 提示错误
@@ -163,10 +168,11 @@ export const useWeatherApiTabItem = (lat?: number, lon?: number) => {
   }, []);
 
   return useTabItem({
-    id: 'weather-api',
-    label: 'Weather Api',
+    tabKey: TAB_KEY_WEATHER_API,
+    tabLabel: 'Weather Api',
     lat,
     lon,
     fetchWeatherInfoCallback: fetchCityWeatherInfo,
+    currentActiveTabKey,
   });
 };
