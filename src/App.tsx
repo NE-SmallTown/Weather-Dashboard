@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Menu, Input, Spin, Tabs, TabsProps } from 'antd';
+import { Menu, Input, Spin, Tabs, TabsProps, message } from 'antd';
 import { MenuInfo } from 'rc-menu/es/interface';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs';
@@ -43,7 +43,7 @@ function App() {
 
       setSearchedCities(cities);
     } else {
-      // TODO 下拉菜单展示输入字符有误请重新输入
+      message.error('Cannot find places according to the name you entered. Please try to enter a different name.');
     }
 
     setIsFetchingSearchedCities(false);

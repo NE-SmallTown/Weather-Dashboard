@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Input, Button } from 'antd';
 import {
   SERVICE_WORKER_ACTION_EXCEED_TEMP_THRESHOLD,
@@ -20,14 +20,10 @@ function WeatherAlertsSettings({ selectedCity, tabKey }: { selectedCity: SearchC
           const { currentTemperature, tabKey: alertTabKey } = res;
 
           console.log(`show notification for ${selectedCity.name}: `, currentTemperature, temperatureThreshold)
-          const notification = new Notification(`Excessive Heat Warning(${selectedCity.name})`, {
+          new Notification(`Excessive Heat Warning(${selectedCity.name})`, {
             icon: '/Weather-Dashboard/icon-temperature-alert.png',
             body: `${currentTemperature}°C exceeds your temperature alert settings(${temperatureThreshold}°C)`,
           });
-
-          notification.onclick = function() {
-            // todo
-          };
 
           break;
         }
