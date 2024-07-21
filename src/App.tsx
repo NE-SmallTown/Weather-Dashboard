@@ -4,10 +4,11 @@ import { MenuInfo } from 'rc-menu/es/interface';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs';
 import dayjsUtcPlugin from 'dayjs/plugin/utc';
-import WeatherInfoPanel from './components/WeatherInfoPanel.tsx';
+import WeatherInfoPanel from './components/WeatherInfoPanel';
+import WeatherAlertsSettings from './components/WeatherAlertsSettings';
 import { openWeatherMapApi } from './utils/request';
-import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts.ts';
-import { TAB_KEY_OPEN_WEATHER_MAP, useWeatherInfoTabItems } from './hooks/weatherInfo.tsx';
+import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts';
+import { TAB_KEY_OPEN_WEATHER_MAP, useWeatherInfoTabItems } from './hooks/weatherInfo';
 import { SearchCity, OpenWeatherMapWeatherInfo } from './types';
 
 import './App.scss';
@@ -77,7 +78,12 @@ function App() {
     children: (
       isFetching
         ? <Spin size='large' spinning={ true } className='icon-is-fetching-weather' />
-        : (weatherInfo && <WeatherInfoPanel weatherInfo={ weatherInfo } />)
+        : (weatherInfo && (
+          <>
+            <WeatherAlertsSettings selectedCity={ selectedCity } tabKey={ tabKey } />
+            <WeatherInfoPanel weatherInfo={ weatherInfo } />
+          </>
+        ))
     ),
   }));
 
@@ -118,6 +124,7 @@ function App() {
             activeKey={ currentActiveTabKey }
             items={ weatherApiTabsItems }
             onChange={ handleWeatherApiTabsChange }
+            destroyInactiveTabPane={ true }
           />
         )
       }
