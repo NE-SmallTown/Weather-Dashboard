@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Menu, Input, Spin } from 'antd';
+import { Menu, Input, Spin, Tabs, TabsProps } from 'antd';
 import { MenuInfo } from 'rc-menu/es/interface';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs';
@@ -7,21 +7,21 @@ import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import WeatherInfoPanel from './components/WeatherInfoPanel.tsx';
 import { openWeatherMapApi } from './utils/request';
 import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts.ts';
-import { SearchCity, OpenWeatherMapWeatherInfo } from './types';
+import { SearchCity, OpenWeatherMapWeatherInfo, UnifiedWeatherInfo } from './types';
 
 import './App.scss';
+import {useWeatherInfoTabItems} from './hooks/weatherInfo.tsx';
 
 dayjs.extend(dayjsUtcPlugin);
 
 function App() {
   const [ currentSearchCity, setCurrentSearchCity ] = useState('');
-  const [ isFetchingCities, setIsFetchingCities ] = useState(false);
+  const [ isFetchingSearchedCities, setIsFetchingSearchedCities ] = useState(false);
   const [ searchedCities, setSearchedCities ] = useState<SearchCity[]>([]);
-  const [ isFetchingWeatherInfo, setIsFetchingWeatherInfo ] = useState(false);
-  const [ selectedCityWeatherInfo, setSelectedCityWeatherInfo ] = useState<OpenWeatherMapWeatherInfo>(null!);
+  const [ selectedCity, setSelectedCity ] = useState<SearchCity>(null!);
 
   const fetchSearchedCities = useCallback(debounce(async (city: string) => {
-    setIsFetchingCities(true);
+    setIsFetchingSearchedCities(true);
 
     const res = await openWeatherMapApi({
       url: '/data/2.5/find',
@@ -44,7 +44,7 @@ function App() {
       // TODO 下拉菜单展示输入字符有误请重新输入
     }
 
-    setIsFetchingCities(false);
+    setIsFetchingSearchedCities(false);
   }, 1000) as Function, []);
 
   useEffect(() => {
@@ -57,29 +57,6 @@ function App() {
     setCurrentSearchCity((e.target as HTMLInputElement).value);
   }, []);
 
-  const fetchCityWeatherInfo = useCallback(async (city: SearchCity) => {
-    setIsFetchingWeatherInfo(true);
-
-    const res = await openWeatherMapApi({
-      url: '/data/2.5/weather',
-      data: {
-        lat: city.lat,
-        lon: city.lon,
-        appid: OPEN_WEATHER_MAP_API_KEY,
-      },
-    });
-
-    if (res.status === 200) {
-      console.log(666666, res);
-
-      setSelectedCityWeatherInfo(res.data);
-    } else {
-      // TODO 提示错误
-    }
-
-    setIsFetchingWeatherInfo(false);
-  }, []);
-
   const handleSelectCity = useCallback(async (clickedMenuItem: MenuInfo) => {
     const selectedCityId = Number(clickedMenuItem.key);
     const selectedCity = searchedCities.find(({ id }) => id === selectedCityId);
@@ -87,9 +64,25 @@ function App() {
     if (selectedCity) {
       setCurrentSearchCity('');
       setSearchedCities([]);
-      await fetchCityWeatherInfo(selectedCity);
+      setSelectedCity(selectedCity);
     }
   }, [ searchedCities ]);
+
+  const weatherInfoTabItems = useWeatherInfoTabItems(selectedCity?.lat, selectedCity?.lon);
+
+  const weatherApiTabsItems: TabsProps['items'] = weatherInfoTabItems.map(({ id, label, isFetching, weatherInfo }) => ({
+    key: id,
+    label: label,
+    children: (
+      isFetching
+        ? <Spin size='large' spinning={ true } className='icon-is-fetching-weather' />
+        : <WeatherInfoPanel weatherInfo={ weatherInfo } />
+    ),
+  }));
+
+  const handleWeatherApiTabsChange = useCallback(() => {
+    // todo
+  }, []);
 
   return (
     <div className='app-page-root'>
@@ -99,7 +92,7 @@ function App() {
           enterButton='Search'
           value={ currentSearchCity }
           onChange={ handleSearchInputChange }
-          loading={ isFetchingCities }
+          loading={ isFetchingSearchedCities }
         />
 
         {
@@ -118,9 +111,7 @@ function App() {
       </div>
 
       {
-        isFetchingWeatherInfo
-          ? <Spin size='large' spinning={ true } className='icon-is-fetching-weather' />
-          : (selectedCityWeatherInfo && <WeatherInfoPanel weatherInfo={ selectedCityWeatherInfo } />)
+        selectedCity && <Tabs items={ weatherApiTabsItems } onChange={ handleWeatherApiTabsChange } />
       }
     </div>
   )
