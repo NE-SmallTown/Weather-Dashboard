@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import { ArrowDownOutlined } from '@ant-design/icons';
-import { formatMeters, kelvin2centigrade } from '../utils';
+import { formatMeters } from '../utils';
 import { UnifiedWeatherInfo } from '../types';
 import { ReactComponent as IconPressure } from '../assets/imgs/icon-pressure.svg';
 

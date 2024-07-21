@@ -32,10 +32,12 @@ export const useTabItem = ({ tabKey, tabLabel, lat, lon, fetchWeatherInfoCallbac
     const doFetch = async () => {
       setIsFetchingWeatherInfo(true);
 
-      const { weatherInfo, error } = await fetchWeatherInfoCallback(lat, lon);
+      const { weatherInfo, error } = await fetchWeatherInfoCallback(lat!, lon!);
 
-      setWeatherInfo(weatherInfo);
-      setIsFetchingWeatherInfo(false);
+      if (!error) {
+        setWeatherInfo(weatherInfo);
+        setIsFetchingWeatherInfo(false);
+      }
     }
 
     if (lat && lon && currentActiveTabKey === tabKey) {
