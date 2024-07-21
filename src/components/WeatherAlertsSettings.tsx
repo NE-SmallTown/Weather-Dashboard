@@ -19,11 +19,13 @@ function WeatherAlertsSettings({ selectedCity, tabKey }: { selectedCity: SearchC
         case SERVICE_WORKER_ACTION_EXCEED_TEMP_THRESHOLD: {
           const { currentTemperature, tabKey: alertTabKey } = res;
 
-          console.log(`show notification for ${selectedCity.name}: `, currentTemperature, temperatureThreshold)
-          new Notification(`Excessive Heat Warning(${selectedCity.name})`, {
-            icon: '/Weather-Dashboard/icon-temperature-alert.png',
-            body: `${currentTemperature}°C exceeds your temperature alert settings(${temperatureThreshold}°C)`,
-          });
+          if (alertTabKey === tabKey) {
+            console.log(`show notification for ${selectedCity.name}: `, currentTemperature, temperatureThreshold)
+            new Notification(`Excessive Heat Warning(${selectedCity.name})`, {
+              icon: '/Weather-Dashboard/icon-temperature-alert.png',
+              body: `${currentTemperature}°C exceeds your temperature alert settings(${temperatureThreshold}°C)`,
+            });
+          }
 
           break;
         }
