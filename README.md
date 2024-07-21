@@ -71,6 +71,8 @@ We use service workers to implement a weather alert system that notifies users w
 
 3. On the main thread side, when it receives messages to let it send notifications, it will call the Web Notification API(`new Notification({ icon, body })`) to notify users about the weather alerts.
 
+> For this phase, the doc says "Use Redux for managing complex application states". But given that there are only 2 components that need to share only 1 state, I don't use `Redux` to make it more concise and readable.
+
 ### Environment setup and deployment instructions.
 
 No actions needed. It will be automatically deployed to https://ne-smalltown.github.io/Weather-Dashboard when a PR(pull request) is merged to the master branch.
