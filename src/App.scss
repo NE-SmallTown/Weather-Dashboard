@@ -20,4 +20,11 @@
         display: flex;
         justify-content: center;
     }
+
+    .weather-tabs {
+
+        .ant-tabs-nav {
+            margin-bottom: 0;
+        }
+    }
 }
