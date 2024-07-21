@@ -5,7 +5,7 @@ export interface SearchCity {
   lon: 116.3972;
 }
 
-export interface CityWeatherInfo {
+export interface OpenWeatherMapWeatherInfo {
   coord: {
     lon: number;
     lat: number;
@@ -32,7 +32,7 @@ export interface CityWeatherInfo {
     speed: number;
     deg: number;
     gust: number;
-  },
+  };
   clouds: {
     all: number;
   };
@@ -46,4 +46,22 @@ export interface CityWeatherInfo {
   id: number;
   name: string;
   cod: number;
+}
+
+export interface UnifiedWeatherInfo {
+  name: string; // Location name
+  country: string; // Location country
+  lon: number;
+  lat: number;
+  localtime: string; // Local time in DD/MM/YYYY HH:mm format
+  weatherIcon: string; // Url of weather condition icon
+  temperature: number; // Temperature in centigrade
+  feelsLikeTemperature: number; // Feels like temperature as centigrade
+  description: string; // location name + country name
+  wind: {
+    deg: number; // Wind direction in degrees
+    speed: number; // Wind speed in meter per second
+  };
+  humidity: number; // Humidity as percentage
+  visibility: number; // Visibility in meter
 }

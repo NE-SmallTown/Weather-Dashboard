@@ -7,7 +7,7 @@ import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import WeatherInfoPanel from './components/WeatherInfoPanel.tsx';
 import { openWeatherMapApi } from './utils/request';
 import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts.ts';
-import { SearchCity, CityWeatherInfo } from './types';
+import { SearchCity, OpenWeatherMapWeatherInfo } from './types';
 
 import './App.scss';
 
@@ -18,7 +18,7 @@ function App() {
   const [ isFetchingCities, setIsFetchingCities ] = useState(false);
   const [ searchedCities, setSearchedCities ] = useState<SearchCity[]>([]);
   const [ isFetchingWeatherInfo, setIsFetchingWeatherInfo ] = useState(false);
-  const [ selectedCityWeatherInfo, setSelectedCityWeatherInfo ] = useState<CityWeatherInfo>(null!);
+  const [ selectedCityWeatherInfo, setSelectedCityWeatherInfo ] = useState<OpenWeatherMapWeatherInfo>(null!);
 
   const fetchSearchedCities = useCallback(debounce(async (city: string) => {
     setIsFetchingCities(true);
@@ -32,7 +32,7 @@ function App() {
     });
 
     if (res.status === 200) {
-      const cities = res.data.list.map(({ coord, id, name }: CityWeatherInfo) => ({
+      const cities = res.data.list.map(({ coord, id, name }: OpenWeatherMapWeatherInfo) => ({
         id,
         name,
         lat: coord.lat,
