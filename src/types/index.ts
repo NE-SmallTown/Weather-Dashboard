@@ -99,8 +99,8 @@ export interface WeatherApiWeatherInfo {
 export interface UnifiedWeatherInfo {
   name: string; // Location name
   country: string; // Location country
-  lon: number;
-  lat: number;
+  lon: number; // Longitude of the location
+  lat: number; // Latitude of the location
   localtime: string; // Local time in DD/MM/YYYY HH:mm format
   weatherIcon: string; // Url of weather condition icon
   temperature: number; // Temperature in centigrade

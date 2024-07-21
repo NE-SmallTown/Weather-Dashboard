@@ -17,6 +17,18 @@ export interface WeatherInfoTabItem {
 export const TAB_KEY_OPEN_WEATHER_MAP = 'open-weather-map';
 export const TAB_KEY_WEATHER_API ='weather-api';
 
+// The abstract layer to define/extend tab items of showing the weather info of a given latitude and longitude.
+// If you want to add one more tab item, and you have a weather api that allows you to get the weather info of a place,
+// all you need to do is defining a function to request the weather info and convert the response to the `UnifiedWeatherInfo`,
+// and then return `
+//  useTabItem({
+//    tabKey: your tab key,
+//    tabLabel: your tab name shown on the page,
+//    fetchWeatherInfoCallback: your callback function that requests the weather info and convert the response to the `UnifiedWeatherInfo` and return it,
+//    ...
+//  })
+// `.
+// `useOpenWeatherMapApiTabItem` is an example for your information.
 export const useTabItem = ({ tabKey, tabLabel, lat, lon, fetchWeatherInfoCallback, currentActiveTabKey } : {
   tabKey: string;
   tabLabel: string;
