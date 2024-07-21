@@ -4,6 +4,7 @@ import {
   SERVICE_WORKER_ACTION_EXCEED_TEMP_THRESHOLD,
   SERVICE_WORKER_ACTION_SET_TEMP_THRESHOLD,
 } from '../utils/consts.ts';
+import { getRegistration } from '../service_worker/mainThread';
 import { SearchCity } from '../types';
 
 import './WeatherAlertsSettings.scss';
@@ -44,7 +45,7 @@ function WeatherAlertsSettings({ selectedCity, tabKey }: { selectedCity: SearchC
 
   const handleClickSubmit = useCallback(async () => {
     if (selectedCity) {
-      const registration = await navigator.serviceWorker.getRegistration();
+      const registration = await getRegistration();
 
       if (registration) {
         if (navigator.serviceWorker.controller) {
@@ -68,7 +69,7 @@ function WeatherAlertsSettings({ selectedCity, tabKey }: { selectedCity: SearchC
 
   return (
     <div className='weather-alerts-settings'>
-      <span className='label'>Temperature Threshold:</span>
+      <span className='label'>Temperature Threshold(monitored every 30s):</span>
 
       <Input
         type='number'

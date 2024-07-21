@@ -1,17 +1,33 @@
+import { SERVICE_WORKER_ACTION_CLEAR_POLLING } from '../utils/consts';
+
 async function registerServiceWorker() {
   console.log('Starting to registerServiceWorker.');
   await navigator.serviceWorker.register('./service_worker.js');
   console.log('registerServiceWorker finished.');
 }
 
-function getRegistration() {
+export function getRegistration() {
   return navigator.serviceWorker.getRegistration();
 }
 
-async function unRegisterServiceWorker() {
+export async function unRegisterServiceWorker() {
   const registration = await getRegistration();
 
   registration && await registration.unregister();
+}
+
+export async function clearPolling() {
+  const registration = await getRegistration();
+
+  if (registration) {
+    if (navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        action: SERVICE_WORKER_ACTION_CLEAR_POLLING,
+      });
+    } else {
+      console.log('No service worker controller found. Try refreshing the page.');
+    }
+  }
 }
 
 function requestNotificationPermission() {
