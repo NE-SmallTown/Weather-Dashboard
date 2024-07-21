@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Menu, Input, Spin, Tabs, TabsProps } from 'antd';
+import { Menu, Input, Spin, Tabs, TabsProps, message } from 'antd';
 import { MenuInfo } from 'rc-menu/es/interface';
 import debounce from 'lodash/debounce';
 import dayjs from 'dayjs';
 import dayjsUtcPlugin from 'dayjs/plugin/utc';
-import WeatherInfoPanel from './components/WeatherInfoPanel.tsx';
+import WeatherInfoPanel from './components/WeatherInfoPanel';
+import WeatherAlertsSettings from './components/WeatherAlertsSettings';
 import { openWeatherMapApi } from './utils/request';
-import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts.ts';
-import { TAB_KEY_OPEN_WEATHER_MAP, useWeatherInfoTabItems } from './hooks/weatherInfo.tsx';
+import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts';
+import { TAB_KEY_OPEN_WEATHER_MAP, useWeatherInfoTabItems } from './hooks/weatherInfo';
 import { SearchCity, OpenWeatherMapWeatherInfo } from './types';
 
 import './App.scss';
@@ -42,7 +43,7 @@ function App() {
 
       setSearchedCities(cities);
     } else {
-      // TODO 下拉菜单展示输入字符有误请重新输入
+      message.error('Cannot find places according to the name you entered. Please try to enter a different name.');
     }
 
     setIsFetchingSearchedCities(false);
@@ -77,7 +78,12 @@ function App() {
     children: (
       isFetching
         ? <Spin size='large' spinning={ true } className='icon-is-fetching-weather' />
-        : (weatherInfo && <WeatherInfoPanel weatherInfo={ weatherInfo } />)
+        : (weatherInfo && (
+          <>
+            <WeatherAlertsSettings selectedCity={ selectedCity } tabKey={ tabKey } />
+            <WeatherInfoPanel weatherInfo={ weatherInfo } />
+          </>
+        ))
     ),
   }));
 
@@ -118,6 +124,7 @@ function App() {
             activeKey={ currentActiveTabKey }
             items={ weatherApiTabsItems }
             onChange={ handleWeatherApiTabsChange }
+            destroyInactiveTabPane={ true }
           />
         )
       }

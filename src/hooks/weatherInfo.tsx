@@ -1,8 +1,9 @@
 import { useEffect, useCallback, useState } from 'react';
+import { message } from 'antd';
+import dayjs from 'dayjs';
 import { OpenWeatherMapWeatherInfo, UnifiedWeatherInfo, WeatherApiWeatherInfo } from '../types';
 import { openWeatherMapApi, weatherApi } from '../utils/request.ts';
 import { OPEN_WEATHER_MAP_API_KEY, WEATHER_API_API_KEY } from '../utils/consts.ts';
-import dayjs from 'dayjs';
 import { kelvin2centigrade } from '../utils';
 
 export type FetchWeatherInfoCallback = (lat: number, lon: number) => Promise<{ weatherInfo: UnifiedWeatherInfo, error: string }>;
@@ -15,7 +16,7 @@ export interface WeatherInfoTabItem {
 }
 
 export const TAB_KEY_OPEN_WEATHER_MAP = 'open-weather-map';
-export const TAB_KEY_WEATHER_API ='weather-api';
+export const TAB_KEY_WEATHER_API = 'weather-api';
 
 // The abstract layer to define/extend tab items of showing the weather info of a given latitude and longitude.
 // If you want to add one more tab item, and you have a weather api that allows you to get the weather info of a place,
@@ -76,7 +77,7 @@ export const useOpenWeatherMapApiTabItem = (currentActiveTabKey: string, lat?: n
     let error = null;
 
     const res = await openWeatherMapApi({
-      url: '/data/2.5/weather',
+      url: 'data/2.5/weather',
       data: {
         lat,
         lon,
@@ -114,8 +115,9 @@ export const useOpenWeatherMapApiTabItem = (currentActiveTabKey: string, lat?: n
         visibility: data.visibility,
       };
     } else {
-      // TODO 提示错误
       error = res.data.message;
+
+      message.error(error);
     }
 
     return {
@@ -171,8 +173,9 @@ export const useWeatherApiTabItem = (currentActiveTabKey: string, lat?: number, 
         visibility: data.current.vis_km * 1000,
       };
     } else {
-      // TODO 提示错误
       error = res.data.message;
+
+      message.error(error);
     }
 
     return {
