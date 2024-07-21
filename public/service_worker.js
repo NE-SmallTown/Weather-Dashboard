@@ -15,6 +15,7 @@ function main() {
     console.log('Service worker now active');
   });
 
+  let intervalTimerIds = [];
   self.addEventListener('message', async event => {
     console.log('service worker side', event.data);
 
@@ -25,7 +26,7 @@ function main() {
         const { tabKey, lat, lon, temperatureThreshold } = res;
 
         // monitor if the temperature exceeds the threshold by polling
-        setInterval(async () => {
+        const timerId = setInterval(async () => {
           let resTemperature = null;
 
           console.log('fetching starts in the service worker')
@@ -51,8 +52,23 @@ function main() {
           }
         }, WEATHER_POLLING_INTERVAL);
 
+        intervalTimerIds.push(timerId);
+        console.log('intervalTimerIds: ', intervalTimerIds);
+
         break;
       }
+
+      case 'clearPolling': {
+        console.log('clearPolling', intervalTimerIds);
+        intervalTimerIds.forEach(timerId => {
+          clearInterval(timerId);
+        });
+        intervalTimerIds = [];
+        console.log('clearPolling', intervalTimerIds);
+
+        break;
+      }
+
       default: {
         break;
       }

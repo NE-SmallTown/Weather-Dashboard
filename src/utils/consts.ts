@@ -7,3 +7,4 @@ export const TEMPERATURE_KELVIN = 273.15;
 
 export const SERVICE_WORKER_ACTION_SET_TEMP_THRESHOLD = 'setTemperatureThreshold';
 export const SERVICE_WORKER_ACTION_EXCEED_TEMP_THRESHOLD = 'exceedTemperatureThreshold';
+export const SERVICE_WORKER_ACTION_CLEAR_POLLING = 'clearPolling';

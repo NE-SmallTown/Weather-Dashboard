@@ -7,8 +7,11 @@ import dayjsUtcPlugin from 'dayjs/plugin/utc';
 import WeatherInfoPanel from './components/WeatherInfoPanel';
 import WeatherAlertsSettings from './components/WeatherAlertsSettings';
 import { openWeatherMapApi } from './utils/request';
-import { OPEN_WEATHER_MAP_API_KEY } from './utils/consts';
+import {
+  OPEN_WEATHER_MAP_API_KEY,
+} from './utils/consts';
 import { TAB_KEY_OPEN_WEATHER_MAP, useWeatherInfoTabItems } from './hooks/weatherInfo';
+import { clearPolling } from './service_worker/mainThread';
 import { SearchCity, OpenWeatherMapWeatherInfo } from './types';
 
 import './App.scss';
@@ -64,6 +67,8 @@ function App() {
     const selectedCity = searchedCities.find(({ id }) => id === selectedCityId);
 
     if (selectedCity) {
+      await clearPolling();
+
       setCurrentSearchCity('');
       setSearchedCities([]);
       setSelectedCity(selectedCity);
@@ -87,7 +92,9 @@ function App() {
     ),
   }));
 
-  const handleWeatherApiTabsChange = useCallback((activeKey: string) => {
+  const handleWeatherApiTabsChange = useCallback(async (activeKey: string) => {
+    await clearPolling();
+
     setCurrentActiveTabKey(activeKey);
   }, []);
 
